@@ -1,0 +1,16 @@
+blueprints
+custom_components/hacs
+
+# already in GIT
+node-red/*
+
+# Zigbee 2 MQTT
+zigbee2mqtt/log
+zigbee2mqtt/socat.log
+
+aircast.xml
+*.log*
+*.db*
+
+.HA_VERSION
+.storage

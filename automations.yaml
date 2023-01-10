@@ -1,0 +1,313 @@
+- alias: Set ventilation Mode Selector
+  trigger:
+    platform: mqtt
+    topic: ventilation/mode
+  action:
+    service: input_select.select_option
+    target:
+      entity_id: input_select.ventilation_mode
+    data:
+      option: '{{ trigger.payload }}'
+  id: 02c71ff8bcae4cf985cd788233879c3c
+- alias: Set Ventilation Mode
+  trigger:
+    platform: state
+    entity_id: input_select.ventilation_mode
+  action:
+    service: mqtt.publish
+    data:
+      topic: ventilation/mode
+      retain: true
+      payload: '{{ states(''input_select.ventilation_mode'') }}'
+  id: 7fbc1204930348f6aca5eb3ff831db6e
+- alias: Set ventilation Bypass Mode Selector
+  trigger:
+    platform: mqtt
+    topic: ventilation/bypass_mode
+  action:
+    service: input_select.select_option
+    target:
+      entity_id: input_select.ventilation_bypass_mode
+    data:
+      option: '{{ trigger.payload }}'
+  id: 88c99fe0bcbc4040ab4dffbe0b9e3aea
+- alias: Set Ventilation Bypass Mode
+  description: If the flow speed is too high, bypass won't be manipulated due to the
+    bad design of the HRV (there is "flapping" / "turbulence" that damages the bypass
+    valve) - the bypass can be broken.
+  trigger:
+  - platform: state
+    entity_id: input_select.ventilation_bypass_mode
+  action:
+  - service: mqtt.publish
+    data:
+      topic: ventilation/bypass_mode
+      retain: true
+      payload: '{{ states(''input_select.ventilation_bypass_mode'') }}'
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.ventilation_flow_speed
+      below: '230'
+    then:
+    - service: mqtt.publish
+      data:
+        topic: ventilation/bypass_mode
+        retain: true
+        payload: '{{ states(''input_select.ventilation_bypass_mode'') }}'
+    else:
+    - service: notify.persistent_notification
+      data:
+        title: Not manipulating bypass due to too high flow speed.
+        message: If you want to manipulate the bypass, you have to first lower the
+          speed.
+  id: cf4077c383774536a3ee09360ade3f38
+- alias: Reset ventilation publish filters after HA start
+  description: Activates reset node in Nodered to force-publish all values again on
+    the next tik
+  trigger:
+  - platform: homeassistant
+    event: start
+  action:
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - service: mqtt.publish
+    data:
+      topic: ventilation/_reset_publish_filters
+  initial_state: 'on'
+  mode: single
+  id: 2cef406d4107492693aa3b5262506a3b
+- alias: Increase ventilation mode to max speed for brief period
+  description: mostly for UI
+  trigger:
+  condition: []
+  action:
+  - variables:
+      original_mode: '{{ states(''input_select.ventilation_mode'') }}'
+  - service: input_select.select_option
+    data:
+      option: max
+    target:
+      entity_id: input_select.ventilation_mode
+  - delay:
+      hours: 0
+      minutes: 20
+      seconds: 0
+      milliseconds: 0
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.ventilation_mode
+    data:
+      option: '{{ original_mode }}'
+  mode: restart
+  id: e6dd405620cc4e738b29c644b53fc4a1
+- alias: Decrease ventilation mode for N minutes
+  description: mostly for UI
+  trigger:
+  action:
+  - variables:
+      original_mode: '{{ states(''input_select.ventilation_mode'') }}'
+  - service: input_select.select_option
+    data:
+      option: low
+    target:
+      entity_id: input_select.ventilation_mode
+  - delay:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.ventilation_mode
+    data:
+      option: '{{ original_mode }}'
+  mode: restart
+  id: 3030f9854db245aa8fae74be855f19a6
+- id: '1667855874828'
+  alias: 'Living Room socket turn off together with subwoofer '
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 681ba6fbe0f445a7da5b92b6554f7d6a
+    entity_id: switch.living_room_socket
+    domain: switch
+  condition: []
+  action:
+  - type: turn_off
+    device_id: f697d9fccceaf1cca6eaa492698b4ca5
+    entity_id: switch.subwoofer_socket
+    domain: switch
+  mode: single
+- id: '1668194329644'
+  alias: '[Work Room] turn on desk lamp after computer socket'
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 82711aff18b001f602929a0eb9921555
+    entity_id: switch.computer_socket
+    domain: switch
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 4e8707092ee431c1976b5263a949d42a
+    entity_id: light.yeelight_desklamp_0x43b404c
+    domain: light
+  mode: single
+- id: '1668450610423'
+  alias: end work
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 3c3e6860f5d770a4dd940e61dac5a22b
+    type: click
+    subtype: double
+    discovery_id: 0x00158d0001a5e88d click_double
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 82711aff18b001f602929a0eb9921555
+    entity_id: switch.computer_socket
+    domain: switch
+  mode: single
+- id: '1668498174792'
+  alias: start work
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 3c3e6860f5d770a4dd940e61dac5a22b
+    type: click
+    subtype: single
+    discovery_id: 0x00158d0001a5e88d click_single
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 82711aff18b001f602929a0eb9921555
+    entity_id: switch.computer_socket
+    domain: switch
+  mode: single
+- id: '1669895999248'
+  alias: Count Heatpump starts
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.espaltherma_iuoperation
+    to: Heating
+  condition:
+  - condition: numeric_state
+    entity_id: sensor.espaltherma_inv_amp
+    above: 0
+  action:
+  - service: counter.increment
+    data: {}
+    target:
+      entity_id: counter.heatpump_starts
+  mode: single
+- id: '1673029988620'
+  alias: Trigger alarm while armed away
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.balcony_door_contact
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.bedroom_window_contact
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.entrance_door_contact
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.kids_room_motion_occupancy
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.ha_alarm
+    state: armed_away
+  action:
+  - service: alarm_control_panel.alarm_trigger
+    data: {}
+    target:
+      entity_id: alarm_control_panel.ha_alarm
+  mode: single
+- id: '1673097637173'
+  alias: '[Bedroom] button turn on/off TV'
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 32f7856c8a35f036014ac55abb34bf99
+    type: click
+    subtype: single
+    discovery_id: 0x00158d00012940e6 click_single
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 92faa0fc5f9369bcc0712670031bd3c8
+    entity_id: switch.bedroom_socket
+    domain: switch
+  mode: single
+- id: '1673184760158'
+  alias: '[Dryer] Send Notify that it''s done'
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 2b149ecb7470473182ecf16c83f1c2bd
+    entity_id: sensor.dryer_machine_socket_power
+    domain: sensor
+    below: 1
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition:
+  - condition: device
+    type: is_on
+    device_id: 2b149ecb7470473182ecf16c83f1c2bd
+    entity_id: switch.dryer_machine_socket
+    domain: switch
+  action:
+  - service: notify.notify
+    data:
+      message: Dryer finished! :-)
+  mode: single
+- id: '1673184859301'
+  alias: '[Wash Machine] finished notification'
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 094b19efbb4af98f408f74b076cd81ab
+    entity_id: sensor.washing_machine_socket_power
+    domain: sensor
+    below: 1
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  condition:
+  - condition: device
+    type: is_on
+    device_id: 094b19efbb4af98f408f74b076cd81ab
+    entity_id: switch.washing_machine_socket
+    domain: switch
+  action:
+  - service: notify.notify
+    data:
+      message: Washing machine finished! :-)
+  mode: single

@@ -1,0 +1,221 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+alarm_control_panel:
+  - platform: manual
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+sensor:
+  # Altherma 3 
+  - platform: template
+    sensors:
+      espaltherma_operation:
+        unique_id: "espaltherma/operation"
+        friendly_name: "Operation mode"
+        value_template: "{{ state_attr('sensor.althermasensors','Operation Mode') }}"
+      espaltherma_iuoperation:
+        unique_id: "espaltherma/iuoperation"
+        friendly_name: "Indoor Operation mode"
+        value_template: "{{ state_attr('sensor.althermasensors','I/U operation mode') }}"
+      espaltherma_buh1:
+        unique_id: "espaltherma/buh1"
+        friendly_name: "BUH Step 1"
+        value_template: "{{ state_attr('sensor.althermasensors','BUH Step1') }}"
+      espaltherma_buh2:
+        unique_id: "espaltherma_buh2"
+        friendly_name: "BUH Step 2"
+        value_template: "{{ state_attr('sensor.althermasensors','BUH Step2') }}"
+      espaltherma_indoor_ambient:
+        unique_id: "espaltherma/indoor_ambient"
+        friendly_name: "Indoor ambient temp"
+        value_template: "{{ state_attr('sensor.althermasensors','Indoor ambient temp. (R1T)') }}"
+        unit_of_measurement: '°C'
+      espaltherma_outdoor_temp:
+        unique_id: "espaltherma/outdoor_temp"
+        friendly_name: "Outdoor air temp."
+        value_template: "{{ state_attr('sensor.althermasensors','Outdoor air temp.(R1T)') }}"
+        unit_of_measurement: '°C'
+      espaltherma_inv_amp:
+        unique_id: "espaltherma/inv_amp"
+        friendly_name: "INV Primary current (A)"
+        value_template: "{{ state_attr('sensor.althermasensors', 'INV primary current (A)') }}"
+        unit_of_measurement: "A"
+      espaltherma_inv_kw:
+        unique_id: "espaltherma/inv_kw"
+        friendly_name: "INV Primary current (kW)"
+        value_template: "{{ float(state_attr('sensor.althermasensors', 'INV primary current (A)')) * 240 / 1000 }}"
+        unit_of_measurement: "kW"
+      espaltherma_lw:
+        unique_id: "espalterma/lw"
+        friendly_name: "LW setpoint (main)"
+        value_template: "{{ state_attr('sensor.althermasensors', 'LW setpoint (main)') }}"
+        unit_of_measurement: "°C"
+      espaltherma_flow:
+        unique_id: "espaltherma/flow"
+        friendly_name: "Flow sensor"
+        value_template: "{{ state_attr('sensor.althermasensors','Flow sensor (l/min)') }}"
+        unit_of_measurement: 'l/min'
+      espaltherma_dhw:
+        unique_id: "espaltherma/dhw"
+        friendly_name: "DHW Temp"
+        value_template: "{{ state_attr('sensor.althermasensors','DHW tank temp. (R5T)') }}"
+        unit_of_measurement: '°C'
+      espaltherma_cop:
+        unique_id: "espaltherma/cop"
+        friendly_name: "COP"
+        unit_of_measurement: 'COP'
+        value_template: "{% if is_state_attr('sensor.althermasensors','Operation Mode', 'Heating') and is_state_attr('sensor.althermasensors','Freeze Protection', 'OFF')  %} 
+{{ 
+  ((state_attr('sensor.althermasensors','Flow sensor (l/min)')| float * 0.06 * 1.16 * (state_attr('sensor.althermasensors','Leaving water temp. before BUH (R1T)') | float - state_attr('sensor.althermasensors','Inlet water temp.(R4T)')|float) )
+    /
+  (state_attr('sensor.althermasensors','INV primary current (A)') | float * state_attr('sensor.althermasensors','Voltage (N-phase) (V)')|float / 1000))
+  |round(2)
+}}
+{% else %} 0 {%endif%}"
+
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /config
+      - type: disk_use
+      - type: disk_free
+      - type: memory_use_percent
+      - type: memory_use
+      - type: memory_free
+      - type: swap_use_percent
+      - type: swap_use
+      - type: swap_free
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+#      - type: network_in
+#        arg: eth0
+#      - type: network_out
+#        arg: eth0
+#      - type: throughput_network_in
+#        arg: eth0
+#      - type: throughput_network_out
+#        arg: eth0
+        #      - type: packets_in
+        #        arg: eth0
+        #      - type: packets_out
+        #        arg: eth0
+        #      - type: ipv4_address
+        #        arg: eth0
+        #      - type: ipv6_address
+        #        arg: eth0
+      - type: processor_use
+      - type: processor_temperature
+      - type: last_boot
+
+
+climate:
+  - platform: generic_thermostat
+    name: Altherma
+    heater: switch.altherma
+    unique_id: "altherma/climate"
+    target_sensor: sensor.espaltherma_indoor_ambient
+    min_temp: 20
+    max_temp: 25
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    min_cycle_duration:
+      minutes: 60
+    away_temp: 20
+    precision: 0.1
+
+
+mqtt:
+  sensor:
+  - unique_id: "ventilation/supply_temperature"
+    name: "Ventilation Supply Temperature"
+    state_topic: "ventilation/supply_temperature"
+    unit_of_measurement: "°C"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/output_temperature"
+    name: "Ventilation Output Temperature"
+    state_topic: "ventilation/output_temperature"
+    unit_of_measurement: "°C"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/outside_temperature"
+    name: "Ventilation Outside Temperature"
+    state_topic: "ventilation/outside_temperature"
+    unit_of_measurement: "°C"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/supply_humidity"
+    name: "Ventilation Supply Humidity"
+    state_topic: "ventilation/supply_humidity"
+    unit_of_measurement: "%"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/output_humidity"
+    name: "Ventilation Output Humidity"
+    state_topic: "ventilation/output_humidity"
+    unit_of_measurement: "%"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/flow_speed"
+    name: "Ventilation Flow Speed"
+    state_topic: "ventilation/flow_speed"
+    unit_of_measurement: "m3"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/flow_speed_pct"
+    name: "Ventilation Flow Speed Percentages"
+    state_topic: "ventilation/flow_speed_pct"
+    unit_of_measurement: "%"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/bypass_state"
+    name: "Ventilation Bypass State"
+    state_topic: "ventilation/bypass_state"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/preheater_state"
+    name: "Ventilation Preheater State"
+    state_topic: "ventilation/preheater_state"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/preheater_output"
+    unit_of_measurement: "%"
+    name: "Ventilation Preheater Output"
+    state_topic: "ventilation/preheater_output"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/filter_state"
+    name: "Ventilation Filter Status"
+    state_topic: "ventilation/filter_state"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/output_pressure"
+    name: "Ventilation Pressure Output"
+    state_topic: "ventilation/output_pressure"
+    unit_of_measurement: "pa"
+  - unique_id: "ventilation/input_pressure"
+    name: "Ventilation Pressure Input"
+    state_topic: "ventilation/input_pressure"
+    unit_of_measurement: "pa"
+  - unique_id: "ventilation/filter_usage"
+    name: "Filter Usage in Hours"
+    state_topic: "ventilation/filter_usage"
+    unit_of_measurement: "h"
+    value_template: "{{ value }}"
+  - unique_id: "ventilation/input_rpm"
+    name: "Input RPM"
+    state_topic: "ventilation/input_rpm"
+    unit_of_measurement: "rpm"
+  - unique_id: "ventilation/output_rpm"
+    name: "Output RPM"
+    state_topic: "ventilation/output_rpm"
+    unit_of_measurement: "rpm"
+
+input_select:
+  ventilation_mode:
+    name: "Ventilation Mode"
+    options:
+      - "low"
+      - "medium"
+      - "high"
+      - "max"
+    icon: mdi:fan

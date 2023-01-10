@@ -1,0 +1,31 @@
+sensor:
+  - platform: template
+    sensors:
+      espaltherma_operation:
+        friendly_name: "Operation mode"
+        value_template: "{{ state_attr('sensor.althermasensors','Operation Mode') }}"
+      espaltherma_iuoperation:
+        friendly_name: "Indoor Operation mode"
+        value_template: "{{ state_attr('sensor.althermasensors','I/U operation mode') }}"
+      espaltherma_dhw:
+        friendly_name: "DHW Temp"
+        value_template: "{{ state_attr('sensor.althermasensors','DHW tank temp. (R5T)') }}"
+        unit_of_measurement: '°C'
+  - espaltherma_cop:
+      friendly_name: "COP"
+      unit_of_measurement: 'COP'
+      value_template: " 0 "
+
+climate:
+  - platform: generic_thermostat
+    name: Altherma
+    heater: switch.altherma
+    target_sensor: sensor.temproom1
+    min_temp: 15
+    max_temp: 25
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    min_cycle_duration:
+      minutes: 30
+    away_temp: 15
+    precision: 0.1
