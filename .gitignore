@@ -8,6 +8,8 @@ node-red/*
 zigbee2mqtt/log
 zigbee2mqtt/socat.log
 
+www/button-card.js
+
 aircast.xml
 *.log*
 *.db*
