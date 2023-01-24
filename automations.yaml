@@ -127,7 +127,7 @@
   mode: restart
   id: 3030f9854db245aa8fae74be855f19a6
 - id: '1667855874828'
-  alias: 'Living Room socket turn off together with subwoofer '
+  alias: '[Living Room] socket turn off together with subwoofer '
   description: ''
   trigger:
   - platform: device
@@ -163,7 +163,7 @@
     domain: light
   mode: single
 - id: '1668450610423'
-  alias: end work
+  alias: '[Work Room] end work "double" click'
   description: ''
   trigger:
   - platform: device
@@ -180,7 +180,7 @@
     domain: switch
   mode: single
 - id: '1668498174792'
-  alias: start work
+  alias: '[Work Room] start work "single" click'
   description: ''
   trigger:
   - platform: device
@@ -298,7 +298,7 @@
     below: 1
     for:
       hours: 0
-      minutes: 5
+      minutes: 1
       seconds: 0
   condition:
   - condition: device
@@ -327,4 +327,116 @@
     data:
       message: single click
       title: test
+  mode: single
+- id: '1673952964643'
+  alias: '[Living Room] socket turn off after 10m inactivity'
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 681ba6fbe0f445a7da5b92b6554f7d6a
+    entity_id: sensor.living_room_socket_power
+    domain: sensor
+    below: 10
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  condition:
+  - condition: device
+    type: is_on
+    device_id: 681ba6fbe0f445a7da5b92b6554f7d6a
+    entity_id: switch.living_room_socket
+    domain: switch
+  action:
+  - type: turn_off
+    device_id: 681ba6fbe0f445a7da5b92b6554f7d6a
+    entity_id: switch.living_room_socket
+    domain: switch
+  - service: notify.notify
+    data:
+      title: Living room
+      message: turned off socket due to inactivity
+  mode: single
+- id: '1673953466782'
+  alias: Low battery level detection
+  description: ''
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      actions:
+      - service: notify.persistent_notification
+        data:
+          message: some of the devices have low battery, please replace!
+          title: Low Battery
+- id: '1673954475080'
+  alias: '[Water Pump] notify if active'
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 7a256028c63066ac86c72de404ca5395
+    entity_id: sensor.water_pump_socket_power
+    domain: sensor
+    above: 10
+  condition:
+  - condition: device
+    type: is_on
+    device_id: 7a256028c63066ac86c72de404ca5395
+    entity_id: switch.water_pump_socket
+    domain: switch
+  action:
+  - service: notify.notify
+    data:
+      title: Water Pump
+      message: water pump is active!
+  mode: single
+- id: '1674344008008'
+  alias: '[Bedroom] Turn off bedroom socket due to inactivity '
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 92faa0fc5f9369bcc0712670031bd3c8
+    entity_id: sensor.bedroom_socket_power
+    domain: sensor
+    below: 10
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  condition:
+  - condition: device
+    type: is_on
+    device_id: 92faa0fc5f9369bcc0712670031bd3c8
+    entity_id: switch.bedroom_socket
+    domain: switch
+  action:
+  - type: turn_off
+    device_id: 92faa0fc5f9369bcc0712670031bd3c8
+    entity_id: switch.bedroom_socket
+    domain: switch
+  - service: notify.notify
+    data:
+      message: turned off socket due to inactivity
+      title: Bedroom
+  mode: single
+- id: '1674490292583'
+  alias: Moon
+  description: it will trigger notification when it's Full Moon
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.moon_phase
+    to: full_moon
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: Moon
+      message: Full Moon
+  - service: notify.persistent_notification
+    data:
+      title: Moon
+      message: Full Moon
   mode: single
