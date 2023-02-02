@@ -1,5 +1,5 @@
 blueprints
-custom_components/hacs
+custom_components/*
 
 # already in GIT
 node-red/*

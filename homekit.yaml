@@ -22,7 +22,8 @@
       - "*.iphone*"
       # Heat recovery
       - input_select.ventilation_mode # heat recovery
-      - sensor.ventilation* # heat recovery
+      - sensor.ventilation* # heat recovery (deprecated)
+      - sensor.brink_*
       # Media Players
       - media_player.*
       # Remote

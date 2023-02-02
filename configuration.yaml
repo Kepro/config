@@ -15,7 +15,8 @@ scene: !include scenes.yaml
 
 homekit: !include homekit.yaml
 
-mqtt: !include mqtt.yaml
+# commented out cuz it was used only for node-red heat recovery... now it's device from node-red
+# mqtt: !include mqtt.yaml
 
 sensor:
   # Altherma 3 
