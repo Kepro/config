@@ -23,7 +23,7 @@
       # Heat recovery
       - input_select.ventilation_mode # heat recovery
       - sensor.ventilation* # heat recovery (deprecated)
-      - "*.brink"
+      - "*.brink*"
       # Media Players
       - media_player.*
       # Remote
