@@ -23,7 +23,7 @@
       # Heat recovery
       - input_select.ventilation_mode # heat recovery
       - sensor.ventilation* # heat recovery (deprecated)
-      - sensor.brink_*
+      - "*.brink"
       # Media Players
       - media_player.*
       # Remote
@@ -91,4 +91,14 @@
       - camera.terrace_sub
   entity_config:
     camera.terrace_sub:
+      support_audio: true
+
+- name: Living Room
+  port: 21071
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.living_room
+  entity_config:
+    camera.living_room:
       support_audio: true

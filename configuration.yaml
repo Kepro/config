@@ -18,6 +18,14 @@ homekit: !include homekit.yaml
 # commented out cuz it was used only for node-red heat recovery... now it's device from node-red
 # mqtt: !include mqtt.yaml
 
+panel_iframe:
+  router:
+    title: "Router"
+    url: "http://192.168.0.1"
+  fridge:
+    title: "HomeBridge"
+    url: "http://192.168.1.95:8581"
+
 sensor:
   # Altherma 3 
   - platform: template
