@@ -1,0 +1,90 @@
+- name: HASS Pixel
+  port: 21065
+  filter:
+    exclude_domains:
+      - camera # cameras excluded as they're as accessory
+      - automation
+      - person
+    exclude_entity_globs:
+      # Daikin Altherma
+      - sensor.espaltherma_* # espaltherma
+      - sensor.altherma* # my altherma sensors
+      - switch.altherma # espaltherma thermostat switch
+      # NUC
+      - sensor.processor_temperature
+      # Helpers
+      - sensor.min_temp
+      - sensor.max_temp
+      - sensor.mean_temp
+      - sensor.median_temp
+      # Devices
+      - "*.ipad*"
+      - "*.iphone*"
+      # Heat recovery
+      - input_select.ventilation_mode # heat recovery
+      - sensor.ventilation* # heat recovery
+      # Media Players
+      - media_player.*
+      # Reolink
+      - binary_sensor.*_motion # reolink motion
+      - binary_sensor.*_vehicle # reolink vehicles
+      - binary_sensor.*_pet # reolink pet
+      - binary_sensor.*_person # reolink person
+      # Dishwasher
+      - "*.dishwasher*" # dishwasher
+      # Co2 Signal (tmrow.com)
+      - sensor.co2_signal*
+      # Vacuum
+      - vacuum.*
+
+- name: Doorbell
+  port: 21066
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.doorbell_sub
+  entity_config:
+    camera.doorbell_sub:
+      support_audio: true
+      linked_motion_sensor: binary_sensor.doorbell_motion
+      linked_doorbell_sensor: binary_sensor.doorbell_visitor
+
+- name: Backyard
+  port: 21067
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.backyard_sub
+  entity_config:
+    camera.backyard_sub:
+      support_audio: true
+
+- name: Entrance
+  port: 21068
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.entrance_sub
+  entity_config:
+    camera.entrance_sub:
+      support_audio: true
+
+- name: Parking Lot
+  port: 21069
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.parking_lot_sub
+  entity_config:
+    camera.parking_lot_sub:
+      support_audio: true
+
+- name: Terrace
+  port: 21070
+  mode: accessory
+  filter:
+    include_entities:
+      - camera.terrace_sub
+  entity_config:
+    camera.terrace_sub:
+      support_audio: true

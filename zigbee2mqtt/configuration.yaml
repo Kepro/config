@@ -46,6 +46,9 @@ devices:
     friendly_name: Water Pump Socket
   '0xa4c1381a0101fbb5':
     friendly_name: Computer Socket
+    debounce: 0
+    homeassistant: {}
+    optimistic: true
   '0xa4c1389a52826c4c':
     friendly_name: Living Room Socket
   '0xa4c1389e585db2ad':
@@ -83,6 +86,11 @@ devices:
   '0xa4c1382980853fdc':
     friendly_name: Air Quality
     temperature_calibration: ''
+    debounce: 996
+    homeassistant: {}
+    optimistic: true
+    debounce_ignore: []
+    qos: 0
 advanced:
   log_syslog:
     app_name: Zigbee2MQTT

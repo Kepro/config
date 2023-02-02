@@ -440,3 +440,33 @@
       title: Moon
       message: Full Moon
   mode: single
+- id: '1674822726842'
+  alias: '[Daikin] Defrost Notification'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.espaltherma_defrost_operation
+    to: 'ON'
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: Daikin
+      message: Defrost Operation
+  mode: single
+- id: '1674822765583'
+  alias: '[Daikin] Startup Notification'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.espaltherma_startup_control
+    to: 'ON'
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: Daikin
+      message: Startup Operation
+  mode: single

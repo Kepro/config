@@ -4,7 +4,7 @@
     "version": 1,
     "source": "zigbee-herdsman@0.14.83-hotfix.0",
     "internal": {
-      "date": "2023-01-23T17:58:19.188Z",
+      "date": "2023-02-01T22:23:29.248Z",
       "znpVersion": 1
     }
   },
@@ -25,7 +25,7 @@
   "network_key": {
     "key": "01030507090b0d0f00020406080a0c0d",
     "sequence_number": 0,
-    "frame_counter": 2601178
+    "frame_counter": 4246844
   },
   "devices": [
     {
@@ -334,8 +334,8 @@
       "is_child": false,
       "link_key": {
         "key": "46581bdfb5483321da32ae302892ace9",
-        "rx_counter": 0,
-        "tx_counter": 0
+        "rx_counter": 73729,
+        "tx_counter": 10
       }
     },
     {

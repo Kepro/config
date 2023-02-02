@@ -13,11 +13,14 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
+homekit: !include homekit.yaml
+
 
 sensor:
   # Altherma 3 
   - platform: template
     sensors:
+      # booleans
       espaltherma_operation:
         unique_id: "espaltherma/operation"
         friendly_name: "Operation mode"
@@ -34,6 +37,36 @@ sensor:
         unique_id: "espaltherma_buh2"
         friendly_name: "BUH Step 2"
         value_template: "{{ state_attr('sensor.althermasensors','BUH Step2') }}"
+      espaltherma_defrost_operation:
+        unique_id: "espaltherma/defrost_operation"
+        friendly_name: "Defrost Operation"
+        value_template: "{{ state_attr('sensor.althermasensors','Defrost Operation') }}"
+      espaltherma_startup_control:
+        unique_id: "espaltherma/startup_control"
+        friendly_name: "Startup Control"
+        value_template: "{{ state_attr('sensor.althermasensors','Startup Control') }}"
+      espaltherma_restart_standby:
+        unique_id: "espaltherma/Restart standby"
+        friendly_name: "Restart standby"
+        value_template: "{{ state_attr('sensor.althermasensors','Restart standby') }}"
+      espaltherma_oil_return_operation:
+        unique_id: "espaltherma/Oil Return Operation"
+        friendly_name: "Oil Return Operation"
+        value_template: "{{ state_attr('sensor.althermasensors','Oil Return Operation') }}"
+
+      espaltherma_3way_valve:
+        unique_id: "espaltherma/3way_valve"
+        friendly_name: "3way valve(On:DHW Off:Space)"
+        value_template: "{{ state_attr('sensor.althermasensors','3way valve(On:DHW Off:Space)') }}"
+
+      # bar
+      espaltherma_water_pressure:
+        unique_id: "espaltherma/water_pressure"
+        friendly_name: "Water pressure"
+        value_template: "{{ state_attr('sensor.althermasensors','Water pressure') }}"
+        unit_of_measurement: 'bar'
+
+      # temperatures  
       espaltherma_indoor_ambient:
         unique_id: "espaltherma/indoor_ambient"
         friendly_name: "Indoor ambient temp"
@@ -44,6 +77,29 @@ sensor:
         friendly_name: "Outdoor air temp."
         value_template: "{{ state_attr('sensor.althermasensors','Outdoor air temp.(R1T)') }}"
         unit_of_measurement: '°C'
+      espaltherma_water_inlet:
+        unique_id: "espaltherma/water_inlet"
+        friendly_name: "Inlet water temp.(R4T)"
+        value_template: "{{ state_attr('sensor.althermasensors','Inlet water temp.(R4T)') }}"
+        unit_of_measurement: '°C'
+      espaltherma_water_before_buh:
+        unique_id: "espaltherma/water_before_BUH"
+        friendly_name: "Leaving water temp. before BUH (R1T)"
+        value_template: "{{ state_attr('sensor.althermasensors','Leaving water temp. before BUH (R1T)') }}"
+        unit_of_measurement: '°C'
+
+      espaltherma_water_after_buh:
+        unique_id: "espaltherma/water_after_BUH"
+        friendly_name: "Leaving water temp. after BUH (R2T)"
+        value_template: "{{ state_attr('sensor.althermasensors','Leaving water temp. after BUH (R2T)') }}"
+        unit_of_measurement: '°C'
+
+      espaltherma_refrig_temp:
+        unique_id: "espaltherma/refrig_temp"
+        friendly_name: "Refrig. Temp. liquid side (R3T)"
+        value_template: "{{ state_attr('sensor.althermasensors','Refrig. Temp. liquid side (R3T)') }}"
+        unit_of_measurement: '°C'
+
       espaltherma_inv_amp:
         unique_id: "espaltherma/inv_amp"
         friendly_name: "INV Primary current (A)"
@@ -123,7 +179,7 @@ climate:
     name: Altherma
     heater: switch.altherma
     unique_id: "altherma/climate"
-    target_sensor: sensor.espaltherma_indoor_ambient
+    target_sensor: sensor.median_temp # sensor.espaltherma_indoor_ambient
     min_temp: 20
     max_temp: 25
     cold_tolerance: 0.5
