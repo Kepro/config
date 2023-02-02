@@ -25,9 +25,12 @@
       - sensor.ventilation* # heat recovery
       # Media Players
       - media_player.*
+      # Remote
+      - remote.*
       # Reolink
       - binary_sensor.*_motion # reolink motion
       - binary_sensor.*_vehicle # reolink vehicles
+      - binary_sensor.*_visitor # reolink visitor (doorbell)
       - binary_sensor.*_pet # reolink pet
       - binary_sensor.*_person # reolink person
       # Dishwasher
