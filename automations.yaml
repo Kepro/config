@@ -470,3 +470,18 @@
       title: Daikin
       message: Startup Operation
   mode: single
+- id: '1675426984418'
+  alias: '[Altherma] thermostat turned on!'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - climate.altherma
+    from: 'off'
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: Thermostat
+      message: Starting heating!
+  mode: single
